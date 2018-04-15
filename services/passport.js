@@ -23,6 +23,7 @@ passport.use(
 		  clientID: keys.googleClientID,
 		  clientSecret: keys.googleClientSecret,
 		  callbackURL: '/auth/google/callback',
+		  // Allows relative path to be resolved properly between Dev and Prod ENVs
 		  proxy: true
 	  },
   	async (accessToken, refreshToken, profile, done) => {
