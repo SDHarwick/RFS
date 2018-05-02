@@ -17,6 +17,35 @@ passport.deserializeUser((id, done) => {
 	});
 });
 
+// passport.use(
+// 	new GoogleStrategy(
+// 		{
+// 		  clientID: keys.googleClientID,
+// 		  clientSecret: keys.googleClientSecret,
+// 		  callbackURL: '/auth/google/callback',
+// 		  // Allows relative path to be resolved properly between Dev and Prod ENVs
+// 		  proxy: true
+// 	  },
+//   	async (accessToken, refreshToken, profile, done) => {
+// 			User.findOne({ googleId: profile.id })
+// 			.then((existingUser) => {
+// 				if (existingUser){
+// 					// We already have a record
+// 					done(null, existingUser);
+
+// 				} else {
+// 					// We dont have a user
+// 					new User({ googleId: profile.id})
+// 						.save()
+// 						.then(user => done(null, user));
+// 				}
+// 			});
+//     }
+//   )
+// );
+
+
+
 passport.use(
 	new GoogleStrategy(
 		{
@@ -27,20 +56,14 @@ passport.use(
 		  proxy: true
 	  },
   	async (accessToken, refreshToken, profile, done) => {
-			User.findOne({ googleId: profile.id })
-			.then((existingUser) => {
-				if (existingUser){
-					// We already have a record
-					done(null, existingUser);
+      const existingUser = await User.findOne({ googleId: profile.id });
 
-				} else {
-					// We dont have a user
-					new User({ googleId: profile.id})
-						.save()
-						.then(user => done(null, user));
-				}
-			});
+      if (existingUser) {
+        return done(null, existingUser);
+      }
+
+      const user = await new User({ googleId: profile.id }).save();
+      done(null, user);
     }
   )
 );
-
